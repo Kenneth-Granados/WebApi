@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Microsoft.EntityFrameworkCore;
+using Repository.IRepositoryGeneric;
+using Repository.RepositoryGeneric;
+
 namespace WebApi.Extensions
 {
     public static class ServiceExtensions
@@ -21,8 +25,22 @@ namespace WebApi.Extensions
     
         //si queremos
 // alojar nuestra aplicación en IIS, necesitamos configurar una integración de IIS que eventualmente nos ayudará con la implementación en IIS.
-        public static void ConfigureIISIntegration(this IServiceCollection services)
-         => services.Configure<IISOptions>(options => { });
+        public static void ConfigureIISIntegration(this IServiceCollection services) => 
+            services.Configure<IISOptions>(options => { });
+
+// agregar el servicio de registro dentro de .NET Contenedor IOC de Core.
+         public static void ConfigureLoggerService(this IServiceCollection services) => 
+            services.AddSingleton<ILoggerManager, LoggerManager>();
+
+        public static void ConfigureRepositoryManager(this IServiceCollection services) => 
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
+
+        public static void ConfigureServiceManager(this IServiceCollection services) => 
+            services.AddScoped<IServiceManager, ServiceManager>();
+
+        public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration) => 
+            services.AddDbContext<RepositoryContext>(opts => 
+            opts.UseSqlServer(configuration.GetConnectionString("sqlConnection")));
 
     }
 
